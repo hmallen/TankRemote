@@ -11,6 +11,22 @@ You can buy one here: [https://www.kogan.com/au/buy/remote-control-spy-tank-ipad
 Installation
 ------------
 
+- Python3
+
+For ubuntu:
+```bash
+sudo apt install python3-gi
+git clone https://github.com/hmallen/TankRemote
+cd TankRemote
+virtualenv --python=python3 --system-site-packages env
+source env/bin/activate
+pip install .
+
+tank_remote
+```
+
+- Python2
+
 For ubuntu:
 ```bash
 sudo apt-get install python-gtk2

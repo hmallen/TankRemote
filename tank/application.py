@@ -1,8 +1,11 @@
 # coding=UTF-8
-import pygtk
-pygtk.require('2.0')
-import gtk
-import glib
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk
+from gi.repository import GLib
+
 from tank.motors import Motors, DEFAULT_IP
 
 
@@ -13,12 +16,12 @@ class Application(object):
         self.ip_box = None
         self.keystate = {k: False for k in ['Up','Down','Left','Right','a','z','x']}
 
-        self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        self.window = Gtk.Window()
         self.window.set_title('WiFi Tank Remote')
         self.window.connect("destroy", self.destroy)
         self.window.set_border_width(10)
 
-        layout = gtk.VBox(False, 5)
+        layout = Gtk.VBox(False, 5)
 
         self.connect_box = self.setup_connection_box()
         layout.add(self.connect_box)
@@ -36,14 +39,14 @@ class Application(object):
 
         self.window.connect("key-press-event", self.on_key_down)
         self.window.connect("key-release-event", self.on_key_up)
-        self.window.set_events(gtk.gdk.KEY_PRESS_MASK  | gtk.gdk.KEY_RELEASE_MASK)
+        self.window.set_events(Gdk.EventMask.KEY_PRESS_MASK  | Gdk.EventMask.KEY_RELEASE_MASK)
 
         self.window.show()
 
-        glib.timeout_add(100, self.tick)
+        GLib.timeout_add(100, self.tick)
 
     def setup_direction_pad(self):
-        box = gtk.VBox(False, 0)
+        box = Gtk.VBox(False, 0)
         button_config = [
             [
                 ('Forward (↑)', ((Motors.LEFT, Motors.FORWARD),
@@ -67,10 +70,10 @@ class Application(object):
         ]
 
         for buttons_set in button_config:
-            hbox = gtk.HBox(False, 0)
+            hbox = Gtk.HBox(False, 0)
             box.pack_start(hbox, True, True, 0)
             for title, commands in buttons_set:
-                inst = gtk.Button(title)
+                inst = Gtk.Button(title)
                 inst.connect('clicked', self.send_command, commands)
                 inst.show()
                 hbox.pack_start(inst, True, True, 0)
@@ -81,13 +84,13 @@ class Application(object):
         return box
 
     def setup_connection_box(self):
-        box = gtk.HBox(False, 0)
-        self.ip_box = gtk.Entry(16)
+        box = Gtk.HBox(False, 0)
+        self.ip_box = Gtk.Entry()#16)
         self.ip_box.set_text(DEFAULT_IP)
         self.ip_box.show()
         box.pack_start(self.ip_box, True, True, 0)
 
-        connect_btn = gtk.Button('Connect')
+        connect_btn = Gtk.Button('Connect')
         connect_btn.connect('clicked', self.on_click_connect)
         connect_btn.show()
         box.pack_start(connect_btn, True, True, 0)
@@ -96,7 +99,7 @@ class Application(object):
         return box
 
     def setup_video_image(self):
-        img = gtk.Image()
+        img = Gtk.Image()
         img.show()
         self.video.widget = img
         return img
@@ -135,12 +138,12 @@ class Application(object):
         return True
 
     def on_key_down(self, widget, data=None):
-        keyname = gtk.gdk.keyval_name(data.keyval)
+        keyname = Gdk.keyval_name(data.keyval)
         if keyname in self.keystate.keys():
             self.keystate[keyname] = True
 
     def on_key_up(self, widget, data=None):
-        keyname = gtk.gdk.keyval_name(data.keyval)
+        keyname = Gdk.keyval_name(data.keyval)
         if keyname in self.keystate.keys():
             self.keystate[keyname] = False
 
@@ -156,4 +159,4 @@ class Application(object):
         self.video.init_connection(self.ip_box.get_text())
 
     def destroy(self, _, data=None):
-        gtk.main_quit()
+        Gtk.main_quit()

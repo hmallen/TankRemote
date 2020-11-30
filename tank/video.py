@@ -1,29 +1,33 @@
 import threading
-import gobject
 import urllib
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+gi.require_version('Gdk', '3.0')
+from gi.repository import Gdk, GdkPixbuf
+from gi.repository import GObject
 
 VIDEO_PORT = 8196
 
 
-class Video(gobject.GObject):
+class Video(GObject.GObject):
     '''
     Connect to the MJPEG stream of the tank!
     '''
     def __init__(self, port=VIDEO_PORT):
-        self.__gobject_init__()
+        GObject.GObject.__init__(self)
         self.port = port
         self.stream = None
         self.thread = None
         self.widget = None
 
     def init_connection(self, ip):
-        print 'Connecting to video on', ip
+        print('Connecting to video on', ip)
         self.stream = urllib.urlopen('http://%s:%d/' % (ip, self.port))
-        print 'Starting video thread'
+        print('Starting video thread')
         self.thread = VideoThread(self, self.widget)
         self.thread.start()
-        print 'connected'
+        print('connected')
 
     def get_raw_frame(self):
         '''
@@ -61,8 +65,8 @@ class VideoThread(threading.Thread):
         for frame in self.video.get_raw_frame():
             if self.quit or frame is None:
                 return
-            loader = gtk.gdk.PixbufLoader('jpeg')
+            loader = GdkPixbuf.PixbufLoader('jpeg')
             loader.write(frame)
             loader.close()
             pixbuf = loader.get_pixbuf()
-            gobject.idle_add(self.widget.set_from_pixbuf, pixbuf)
+            GObject.idle_add(self.widget.set_from_pixbuf, pixbuf)

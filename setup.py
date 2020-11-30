@@ -4,9 +4,10 @@ setup(
     name='TankRemote',
     version='1.0',
     description='Remote controller application for a WiFi tank',
-    author='Michael Cooper',
-    author_email='mic159@gmail.com',
+    author='Michael Cooper, Hunter Allen',
+    author_email='mic159@gmail.com, allenhm@gmail.com',
     packages=['tank'],
+    python_requires='>=3.6',
     install_requires=[
     #    'pygtk'
     ],
